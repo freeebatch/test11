@@ -34,6 +34,19 @@ from datetime import datetime
 import time
 from concurrent.futures import ThreadPoolExecutor
 THREADPOOL = ThreadPoolExecutor(max_workers=1000)
+  import os
+  from flask import Flask
+
+  app = Flask(__name__)
+
+  @app.route('/')
+  def home():
+      return "Hello, World!"
+
+  if __name__ == '__main__':
+      port = int(os.environ.get("PORT", 1000))  # Default to 1000 if PORT is not set
+      app.run(host='0.0.0.0', port=port)
+  
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -50,9 +63,6 @@ bot = Client(
     api_id=api_id,
     api_hash=api_hash,
     bot_token=bot_token)
-  import os
-  port = int(os.environ.get("PORT", 1000))  # Default to 8000 if PORT is not set
-  
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
