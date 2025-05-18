@@ -50,9 +50,9 @@ bot = Client(
     api_id=api_id,
     api_hash=api_hash,
     bot_token=bot_token)
-const express = require('1000')
-const app = express()
-const port = process.env.PORT || 1000 
+  import os
+  port = int(os.environ.get("PORT", 1000))  # Default to 8000 if PORT is not set
+  
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
