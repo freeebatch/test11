@@ -18,7 +18,6 @@ import uuid
 import random
 import string
 import hashlib
-from flask import 
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait
