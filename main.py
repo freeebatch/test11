@@ -50,7 +50,17 @@ bot = Client(
     api_id=api_id,
     api_hash=api_hash,
     bot_token=bot_token)
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 1000 
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
 @bot.on_message(filters.command(["start"]))
 async def start(bot, message):
   random_image_url = random.choice(image_list)
