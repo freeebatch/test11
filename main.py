@@ -18,6 +18,7 @@ import uuid
 import random
 import string
 import hashlib
+from flask import 
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait
@@ -67,7 +68,15 @@ bot = Client(
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
+# Flask app for Render
+app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    app.run(host="0.0.0.0", port=1000) #Use 8080 Port here, if you're deploying it on koyeb
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
