@@ -9,6 +9,8 @@ from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import os
+from flask import Flask
+
 import base64
 from pyrogram import Client, filters
 import sys
@@ -34,13 +36,10 @@ from datetime import datetime
 import time
 from concurrent.futures import ThreadPoolExecutor
 THREADPOOL = ThreadPoolExecutor(max_workers=1000)
-  import os
-  from flask import Flask
+app = Flask(__name__)
 
-  app = Flask(__name__)
-
-  @app.route('/')
-  def home():
+@app.route('/')
+ def home():
       return "Hello, World!"
 
   if __name__ == '__main__':
