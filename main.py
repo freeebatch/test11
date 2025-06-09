@@ -81,17 +81,17 @@ if __name__ == "__main__":
     import threading
     threading.Thread(target=run_flask).start()  # Start Flask in a separate thread
     bot.run()
- keyboard = [
+keyboard = InlineKeyboardMarkup([
     [
-      InlineKeyboardButton("🚀 Physics Wallah without Purchase 🚀", callback_data="pwwp")
+        InlineKeyboardButton("🚀 Physics Wallah without Purchase 🚀", callback_data="pwwp")
     ],
     [
-      InlineKeyboardButton("📘 Classplus without Purchase 📘", callback_data="cpwp")
+        InlineKeyboardButton("📘 Classplus without Purchase 📘", callback_data="cpwp")
     ],
     [
-      InlineKeyboardButton("📒 Appx Without Purchase 📒", callback_data="appxwp")
+        InlineKeyboardButton("📒 Appx Without Purchase 📒", callback_data="appxwp")
     ]
-  ]
+])
 
   reply_markup = InlineKeyboardMarkup(keyboard)
 
