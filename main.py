@@ -1,45 +1,54 @@
-import os
-import sys
-import re
-import json
-import uuid
-import time
-import base64
-import random
-import string
-import hashlib
-import logging
-import zipfile
 import requests
 import asyncio
 import aiohttp
-
-from datetime import datetime
+import json
+import zipfile
 from typing import Dict, List, Any, Tuple
 from collections import defaultdict
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from concurrent.futures import ThreadPoolExecutor
-
-from flask import Flask
+import os
+import base64
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+import sys
+import re
+import requests
+import uuid
+import random
+import string
+import hashlib
+from flask import Flask
+import threading
+from pyrogram.types.messages_and_media import message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait
-from pyrogram.enums import ChatMemberStatus
-from pyrogram.raw.functions.channels import GetParticipants
 from pyromod import listen
 from pyromod.exceptions.listener_timeout import ListenerTimeout
-
+from pyrogram.types import Message
+import pyrogram
+from pyrogram import Client, filters
+from pyrogram.types import User, Message
+from pyrogram.enums import ChatMemberStatus
+from pyrogram.raw.functions.channels import GetParticipants
 from config import api_id, api_hash, bot_token, auth_users
-
-# Logging
+from datetime import datetime
+import time
+from concurrent.futures import ThreadPoolExecutor
+THREADPOOL = ThreadPoolExecutor(max_workers=1000)
+import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Thread Pool
-THREADPOOL = ThreadPoolExecutor(max_workers=1000)
 
-# Flask App
+# Bot credentials from environment variables (Render compatible)
+API_ID = int(os.environ.get("API_ID", 28413721))
+API_HASH = os.environ.get("API_HASH", "c353284aee7154723e9766470434cf0a")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "6393100057:AAFgUrLELyXbWFCWpGqR7WzVxWtba4nmJAA")
+
+# Initialize Bot Globally (IMPORTANT FIX)
+bot = Client("bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+# Flask app for Render
 app = Flask(__name__)
 
 @app.route('/')
@@ -47,57 +56,40 @@ def home():
     return "Bot is running!"
 
 def run_flask():
-    port = int(os.environ.get("PORT", 1000))  # Use 8080 if deploying on Koyeb
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=8080) #Use 8080 Port here, if you're deploying it on koyeb
+    
 
-# Bot Instance
-bot = Client(
-    "bot",
-    api_id=api_id,
-    api_hash=api_hash,
-    bot_token=bot_token
-)
-
-# Random Image List
 image_list = [
-    "https://graph.org/file/8b1f4146a8d6b43e5b2bc-be490579da043504d5.jpg",
-    "https://graph.org/file/b75dab2b3f7eaff612391-282aa53538fd3198d4.jpg",
-    "https://graph.org/file/38de0b45dd9144e524a33-0205892dd05593774b.jpg",
-    "https://graph.org/file/be39f0eebb9b66d7d6bc9-59af2f46a4a8c510b7.jpg",
-    "https://graph.org/file/8b7e3d10e362a2850ba0a-f7c7c46e9f4f50b10b.jpg",
+"https://graph.org/file/8b1f4146a8d6b43e5b2bc-be490579da043504d5.jpg",
+"https://graph.org/file/b75dab2b3f7eaff612391-282aa53538fd3198d4.jpg",
+"https://graph.org/file/38de0b45dd9144e524a33-0205892dd05593774b.jpg",
+"https://graph.org/file/be39f0eebb9b66d7d6bc9-59af2f46a4a8c510b7.jpg",
+"https://graph.org/file/8b7e3d10e362a2850ba0a-f7c7c46e9f4f50b10b.jpg",
 ]
+print(4321)
 
-# Start Command Handler
+
 @bot.on_message(filters.command(["start"]))
-async def start_handler(client, message: Message):
-    random_image_url = random.choice(image_list)
-    await message.reply_photo(
-        photo=random_image_url,
-        caption="👋 Welcome! Here's a random image."
-    )
+async def start(bot, message):
+  random_image_url = random.choice(image_list)
 
-# Start Flask and Bot
-if __name__ == "__main__":
-    import threading
-    threading.Thread(target=run_flask).start()  # Start Flask in a separate thread
-    bot.run()
-keyboard = InlineKeyboardMarkup([
+  keyboard = [
     [
-        InlineKeyboardButton("🚀 Physics Wallah without Purchase 🚀", callback_data="pwwp")
+      InlineKeyboardButton("🚀 Physics Wallah without Purchase 🚀", callback_data="pwwp")
     ],
     [
-        InlineKeyboardButton("📘 Classplus without Purchase 📘", callback_data="cpwp")
+      InlineKeyboardButton("📘 Classplus without Purchase 📘", callback_data="cpwp")
     ],
     [
-        InlineKeyboardButton("📒 Appx Without Purchase 📒", callback_data="appxwp")
+      InlineKeyboardButton("📒 Appx Without Purchase 📒", callback_data="appxwp")
     ]
-])
+  ]
 
   reply_markup = InlineKeyboardMarkup(keyboard)
 
   await message.reply_photo(
     photo=random_image_url,
-    caption="**Developer - @pwextractowner\nPLEASE👇PRESS👇HERE**",
+    caption="**PLEASE👇PRESS👇HERE**",
     quote=True,
     reply_markup=reply_markup
   )
@@ -116,7 +108,7 @@ async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dic
                 response.raise_for_status()
                 return await response.json()
         except aiohttp.ClientError as e:
-            logging.error(f"Attempt {attempt + 1} failed: aiohttp error fetching {url}: {e}")
+            logging.err + 1} failed: aiohttp error fetching {url}: {e}")
         except Exception as e:
             logging.exception(f"Attempt {attempt + 1} failed: Unexpected error fetching {url}: {e}")
 
