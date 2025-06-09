@@ -1,72 +1,45 @@
+import os
+import sys
+import re
+import json
+import uuid
+import time
+import base64
+import random
+import string
+import hashlib
+import logging
+import zipfile
 import requests
 import asyncio
 import aiohttp
-import json
-import zipfile
+
+from datetime import datetime
 from typing import Dict, List, Any, Tuple
 from collections import defaultdict
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-import os
-from flask import Flask
+from concurrent.futures import ThreadPoolExecutor
 
-import base64
+from flask import Flask
 from pyrogram import Client, filters
-import sys
-import re
-import requests
-import uuid
-import random
-import string
-import hashlib
-from pyrogram.types.messages_and_media import message
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from pyrogram.errors import FloodWait
-from pyromod import listen
-from pyromod.exceptions.listener_timeout import ListenerTimeout
-from pyrogram.types import Message
-import pyrogram
-from pyrogram import Client, filters
-from pyrogram.types import User, Message
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.raw.functions.channels import GetParticipants
+from pyromod import listen
+from pyromod.exceptions.listener_timeout import ListenerTimeout
+
 from config import api_id, api_hash, bot_token, auth_users
-from datetime import datetime
-import time
-from concurrent.futures import ThreadPoolExecutor
-THREADPOOL = ThreadPoolExecutor(max_workers=1000)
-app = Flask(__name__)
 
-@app.route('/')
- def home():
-      return "Hello, World!"
-
-  if __name__ == '__main__':
-      port = int(os.environ.get("PORT", 1000))  # Default to 1000 if PORT is not set
-      app.run(host='0.0.0.0', port=port)
-  
-import logging
+# Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-image_list = [
-"https://graph.org/file/8b1f4146a8d6b43e5b2bc-be490579da043504d5.jpg",
-"https://graph.org/file/b75dab2b3f7eaff612391-282aa53538fd3198d4.jpg",
-"https://graph.org/file/38de0b45dd9144e524a33-0205892dd05593774b.jpg",
-"https://graph.org/file/be39f0eebb9b66d7d6bc9-59af2f46a4a8c510b7.jpg",
-"https://graph.org/file/8b7e3d10e362a2850ba0a-f7c7c46e9f4f50b10b.jpg",
-]
-print(4321)
-bot = Client(
-    "bot",
-    api_id=api_id,
-    api_hash=api_hash,
-    bot_token=bot_token)
+# Thread Pool
+THREADPOOL = ThreadPoolExecutor(max_workers=1000)
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-# Flask app for Render
+# Flask App
 app = Flask(__name__)
 
 @app.route('/')
@@ -74,15 +47,41 @@ def home():
     return "Bot is running!"
 
 def run_flask():
-    app.run(host="0.0.0.0", port=1000) #Use 8080 Port here, if you're deploying it on koyeb
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
-@bot.on_message(filters.command(["start"]))
-async def start(bot, message):
-  random_image_url = random.choice(image_list)
+    port = int(os.environ.get("PORT", 1000))  # Use 8080 if deploying on Koyeb
+    app.run(host="0.0.0.0", port=port)
 
-  keyboard = [
+# Bot Instance
+bot = Client(
+    "bot",
+    api_id=api_id,
+    api_hash=api_hash,
+    bot_token=bot_token
+)
+
+# Random Image List
+image_list = [
+    "https://graph.org/file/8b1f4146a8d6b43e5b2bc-be490579da043504d5.jpg",
+    "https://graph.org/file/b75dab2b3f7eaff612391-282aa53538fd3198d4.jpg",
+    "https://graph.org/file/38de0b45dd9144e524a33-0205892dd05593774b.jpg",
+    "https://graph.org/file/be39f0eebb9b66d7d6bc9-59af2f46a4a8c510b7.jpg",
+    "https://graph.org/file/8b7e3d10e362a2850ba0a-f7c7c46e9f4f50b10b.jpg",
+]
+
+# Start Command Handler
+@bot.on_message(filters.command(["start"]))
+async def start_handler(client, message: Message):
+    random_image_url = random.choice(image_list)
+    await message.reply_photo(
+        photo=random_image_url,
+        caption="👋 Welcome! Here's a random image."
+    )
+
+# Start Flask and Bot
+if __name__ == "__main__":
+    import threading
+    threading.Thread(target=run_flask).start()  # Start Flask in a separate thread
+    bot.run()
+ keyboard = [
     [
       InlineKeyboardButton("🚀 Physics Wallah without Purchase 🚀", callback_data="pwwp")
     ],
